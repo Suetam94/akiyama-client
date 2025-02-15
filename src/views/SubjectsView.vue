@@ -21,7 +21,7 @@
           <v-btn icon color="blue" @click="editSubject(item)">
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
-          <v-btn icon color="red" @click="deleteSubject(item.id)">
+          <v-btn icon color="red" @click="confirmDelete(item.id)">
             <v-icon>mdi-delete</v-icon>
           </v-btn>
         </div>
@@ -35,11 +35,30 @@
           {{ editing ? "Editar Matéria" : "Nova Matéria" }}
         </v-card-title>
         <v-card-text>
-          <v-text-field v-model="subject.name" label="Nome da Matéria" outlined dense />
+          <v-text-field
+            v-model="subject.name"
+            label="Nome da Matéria"
+            outlined
+            dense
+            :error-messages="nameError"
+            @input="validateInput"
+          />
         </v-card-text>
         <v-card-actions class="justify-end">
           <v-btn color="red" variant="text" @click="closeDialog">Cancelar</v-btn>
           <v-btn color="green" variant="text" @click="saveSubject">Salvar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <v-dialog v-model="deleteDialog" max-width="400px">
+      <v-card>
+        <v-card-title class="text-h5">Confirmação</v-card-title>
+        <v-card-text>Tem certeza que deseja excluir esta matéria?</v-card-text>
+        <v-card-actions class="justify-end">
+          <v-btn color="gray" variant="text" @click="deleteDialog = false">Cancelar</v-btn>
+          <v-btn color="red" variant="text" @click="deleteSubject">Excluir</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -71,21 +90,50 @@ export default defineComponent({
 
     const dialog = ref(false);
     const editing = ref(false);
+    const nameError = ref("");
     const subject = ref<Subject>({ id: 0, name: "" });
+    const deleteDialog = ref(false);
+    const subjectToDelete = ref<number | null>(null);
+
+    const confirmDelete = (id: number) => {
+      subjectToDelete.value = id;
+      deleteDialog.value = true;
+    };
+
+    const deleteSubject = () => {
+      if (subjectToDelete.value !== null) {
+        subjects.value = subjects.value.filter((s) => s.id !== subjectToDelete.value);
+      }
+      deleteDialog.value = false;
+      subjectToDelete.value = null;
+    };
 
     const openDialog = () => {
       subject.value = { id: 0, name: "" };
       editing.value = false;
+      nameError.value = "";
       dialog.value = true;
     };
 
     const editSubject = (item: Subject) => {
       subject.value = { ...item };
       editing.value = true;
+      nameError.value = "";
       dialog.value = true;
     };
 
+    const validateInput = () => {
+      if (!subject.value.name.trim()) {
+        nameError.value = "O nome da matéria não pode estar vazio.";
+      } else {
+        nameError.value = "";
+      }
+    };
+
     const saveSubject = () => {
+      validateInput();
+      if (nameError.value) return;
+
       if (editing.value) {
         const index = subjects.value.findIndex((s) => s.id === subject.value.id);
         if (index !== -1) subjects.value[index] = { ...subject.value };
@@ -94,10 +142,6 @@ export default defineComponent({
         subjects.value.push({ ...subject.value });
       }
       closeDialog();
-    };
-
-    const deleteSubject = (id: number) => {
-      subjects.value = subjects.value.filter((s) => s.id !== id);
     };
 
     const closeDialog = () => {
@@ -110,6 +154,11 @@ export default defineComponent({
       dialog,
       editing,
       subject,
+      nameError,
+      deleteDialog,
+      subjectToDelete,
+      confirmDelete,
+      validateInput,
       openDialog,
       editSubject,
       saveSubject,
