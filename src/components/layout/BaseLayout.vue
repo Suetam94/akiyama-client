@@ -7,7 +7,7 @@
     <AppSidebar v-model="drawer" />
 
     <!-- Main Area -->
-    <v-main>
+    <v-main class="main-container">
       <router-view />
     </v-main>
 
@@ -40,3 +40,10 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.main-container {
+  height: 100vh;
+  width: 100vw;
+}
+</style>
