@@ -60,7 +60,7 @@ export default defineComponent({
 <style scoped>
 .full-height {
   height: 100vh;
-  background-color: #f4f6f9; /* Fundo mais suave */
+  background-color: #f4f6f9;
 }
 
 .subtitle {
