@@ -85,6 +85,8 @@ interface Exam {
   score: number;
   studentId: number;
   subjectId: number;
+  student: { name: string };
+  subject: { name: string };
 }
 
 interface Student {
@@ -111,8 +113,8 @@ export default defineComponent({
     const headers = ref([
       { title: "ID", key: "id" },
       { title: "Nota", key: "score" },
-      { title: "Aluno", key: "studentId" },
-      { title: "Matéria", key: "subjectId" },
+      { title: "Aluno", key: "student.name" },
+      { title: "Matéria", key: "subject.name" },
       { title: "Ações", key: "actions", sortable: false },
     ]);
 
@@ -122,26 +124,53 @@ export default defineComponent({
     const studentError = ref("");
     const subjectError = ref("");
     const scoreError = ref("");
-    const exam = ref<Exam>({ id: 0, score: 0, studentId: 0, subjectId: 0 });
+    const exam = ref<Exam>({
+      id: 0,
+      score: 0,
+      studentId: 0,
+      subjectId: 0,
+      student: { name: "" },
+      subject: { name: "" },
+    });
     const examToDelete = ref<number | null>(null);
     const errorSnackbar = ref(false);
     const errorMessage = ref("");
 
     const fetchData = async () => {
       try {
-        [students.value, subjects.value, exams.value] = await Promise.all([
+        const [studentsData, subjectsData, examsData] = await Promise.all([
           studentsService.getAll(),
           subjectsService.getAll(),
           examsService.getAll(),
         ]);
+
+        students.value = studentsData;
+        subjects.value = subjectsData;
+
+        exams.value = examsData.map((exam) => ({
+          id: exam.id,
+          score: exam.score,
+          studentId: exam.studentId,
+          subjectId: exam.subjectId,
+          student: { name: exam.student.name },
+          subject: { name: exam.subject.name },
+        })) as Exam[];
       } catch (error) {
-        console.error("Erro ao carregar dados", error);
-        showError("Erro ao carregar dados. Tente novamente.");
+        console.error("Erro ao carregar provas", error);
+        showError("Erro ao carregar provas. Tente novamente.");
       }
     };
 
+
     const openDialog = () => {
-      exam.value = { id: 0, score: 0, studentId: 0, subjectId: 0 };
+      exam.value = {
+        id: 0,
+        score: 0,
+        studentId: 0,
+        subjectId: 0,
+        student: { name: "" },
+        subject: { name: "" },
+      };
       editing.value = false;
       clearErrors();
       dialog.value = true;
@@ -164,8 +193,8 @@ export default defineComponent({
 
     const saveExam = async () => {
       if (!validateInput()) return;
-      const { score, studentId, subjectId } = exam.value
-      const examData = { score, studentId, subjectId }
+      const { score, studentId, subjectId } = exam.value;
+      const examData = { score, studentId, subjectId };
 
       try {
         if (editing.value) {
