@@ -1,7 +1,10 @@
 <template>
   <v-container fluid class="full-height">
     <div class="d-flex justify-space-between align-center mb-4 px-4">
-      <h2>Matérias</h2>
+      <div class="d-flex flex-row align-center">
+        <v-icon size="36" class="mr-2">mdi-book-open-variant</v-icon>
+        <h2>Matérias</h2>
+      </div>
       <v-btn color="primary" @click="openDialog">
         <v-icon left>mdi-plus</v-icon> Nova Matéria
       </v-btn>
