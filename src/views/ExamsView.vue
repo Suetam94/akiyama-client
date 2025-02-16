@@ -1,6 +1,5 @@
 <template>
   <v-container fluid class="full-height">
-    <!-- Cabeçalho -->
     <div class="d-flex justify-space-between align-center mb-4 px-4">
       <h2>Provas</h2>
       <v-btn color="primary" @click="openDialog">
@@ -8,90 +7,23 @@
       </v-btn>
     </div>
 
-    <!-- Tabela -->
-    <v-data-table
-      :headers="headers"
-      :items="exams"
-      class="elevation-2 full-width"
-      no-data-text="Nenhuma prova cadastrada"
-      density="comfortable"
-    >
-      <template v-slot:[`item.actions`]="{ item }">
-        <div class="d-flex gap-buttons">
-          <v-btn icon color="blue" @click="editExam(item)">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-          <v-btn icon color="red" @click="confirmDelete(item.id)">
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
-        </div>
-      </template>
-    </v-data-table>
+    <BaseTable :headers="headers" :items="exams" @edit="editExam" @delete="confirmDelete" />
 
-    <!-- Modal de Cadastro/Edição -->
-    <v-dialog v-model="dialog" max-width="500px">
-      <v-card>
-        <v-card-title>
-          {{ editing ? "Editar Prova" : "Nova Prova" }}
-        </v-card-title>
-        <v-card-text>
-          <v-select
-            v-model="exam.studentId"
-            label="Aluno"
-            :items="students"
-            item-title="name"
-            item-value="id"
-            outlined
-            dense
-            required
-            :error-messages="studentError"
-          />
+    <BaseFormDialog v-model="dialog" :title="editing ? 'Editar Prova' : 'Nova Prova'" @close="closeDialog" @save="saveExam">
+      <v-select v-model="exam.studentId" label="Aluno" :items="students" item-title="name" item-value="id" outlined dense required :error-messages="studentError" />
+      <v-select v-model="exam.subjectId" label="Matéria" :items="subjects" item-title="name" item-value="id" outlined dense required :error-messages="subjectError" />
+      <v-text-field v-model="exam.score" label="Nota" type="number" outlined dense required :error-messages="scoreError" />
+    </BaseFormDialog>
 
-          <v-select
-            v-model="exam.subjectId"
-            label="Matéria"
-            :items="subjects"
-            item-title="name"
-            item-value="id"
-            outlined
-            dense
-            required
-            :error-messages="subjectError"
-          />
-
-          <v-text-field
-            v-model="exam.score"
-            label="Nota"
-            type="number"
-            outlined
-            dense
-            required
-            :error-messages="scoreError"
-          />
-        </v-card-text>
-        <v-card-actions class="justify-end">
-          <v-btn color="red" variant="text" @click="closeDialog">Cancelar</v-btn>
-          <v-btn color="green" variant="text" @click="saveExam">Salvar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Modal de Confirmação de Exclusão -->
-    <v-dialog v-model="deleteDialog" max-width="400px">
-      <v-card>
-        <v-card-title class="text-h5">Confirmação</v-card-title>
-        <v-card-text>Tem certeza que deseja excluir esta prova?</v-card-text>
-        <v-card-actions class="justify-end">
-          <v-btn color="gray" variant="text" @click="deleteDialog = false">Cancelar</v-btn>
-          <v-btn color="red" variant="text" @click="deleteExam">Excluir</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <BaseDeleteDialog v-model="deleteDialog" message="Tem certeza que deseja excluir esta prova?" @cancel="deleteDialog = false" @confirm="deleteExam" />
   </v-container>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import BaseTable from "@/components/BaseTable.vue";
+import BaseFormDialog from "@/components/BaseFormDialog.vue";
+import BaseDeleteDialog from "@/components/BaseDeleteDialog.vue";
 
 interface Exam {
   id: number;
@@ -112,6 +44,11 @@ interface Subject {
 
 export default defineComponent({
   name: "ExamsView",
+  components: {
+    BaseTable,
+    BaseFormDialog,
+    BaseDeleteDialog,
+  },
   setup() {
     const students = ref<Student[]>([
       { id: 1, name: "João Silva" },
@@ -148,20 +85,14 @@ export default defineComponent({
     const openDialog = () => {
       exam.value = { id: 0, score: 0, studentId: 0, subjectId: 0 };
       editing.value = false;
+      clearErrors();
       dialog.value = true;
     };
-
-    const closeDialog = () => {
-      dialog.value = false;
-      studentError.value = "";
-      subjectError.value = "";
-      scoreError.value = "";
-    };
-
 
     const editExam = (item: Exam) => {
       exam.value = { ...item };
       editing.value = true;
+      clearErrors();
       dialog.value = true;
     };
 
@@ -169,11 +100,13 @@ export default defineComponent({
       studentError.value = exam.value.studentId ? "" : "Selecione um aluno.";
       subjectError.value = exam.value.subjectId ? "" : "Selecione uma matéria.";
       scoreError.value = exam.value.score >= 0 ? "" : "A nota deve ser maior ou igual a 0.";
+
       return !studentError.value && !subjectError.value && !scoreError.value;
     };
 
     const saveExam = () => {
       if (!validateInput()) return;
+
       if (editing.value) {
         const index = exams.value.findIndex((e) => e.id === exam.value.id);
         if (index !== -1) exams.value[index] = { ...exam.value };
@@ -181,7 +114,7 @@ export default defineComponent({
         exam.value.id = exams.value.length + 1;
         exams.value.push({ ...exam.value });
       }
-      dialog.value = false;
+      closeDialog();
     };
 
     const confirmDelete = (id: number) => {
@@ -194,28 +127,38 @@ export default defineComponent({
       deleteDialog.value = false;
     };
 
+    const closeDialog = () => {
+      dialog.value = false;
+      clearErrors();
+    };
+
+    const clearErrors = () => {
+      studentError.value = "";
+      subjectError.value = "";
+      scoreError.value = "";
+    };
+
     return {
-      exams,
       students,
       subjects,
+      exams,
       headers,
       dialog,
-      editing,
       deleteDialog,
-      exam,
-      examToDelete,
+      editing,
       studentError,
       subjectError,
       scoreError,
-      closeDialog,
+      exam,
+      examToDelete,
       openDialog,
       editExam,
+      validateInput,
       saveExam,
       confirmDelete,
       deleteExam,
+      closeDialog,
     };
   },
 });
-
 </script>
-
