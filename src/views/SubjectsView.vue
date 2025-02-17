@@ -10,18 +10,37 @@
       </v-btn>
     </div>
 
+    <!-- Tabela -->
     <BaseTable :headers="headers" :items="subjects" @edit="editSubject" @delete="confirmDelete" />
 
+    <!-- Modal de Formulário -->
     <BaseFormDialog v-model="dialog" :title="editing ? 'Editar Matéria' : 'Nova Matéria'" @close="closeDialog" @save="saveSubject">
-      <v-text-field v-model="subject.name" label="Nome da Matéria" outlined dense required :error-messages="nameError" />
+      <v-text-field
+        v-model="subject.name"
+        label="Nome da Matéria"
+        outlined
+        dense
+        required
+        :error-messages="nameError"
+      />
     </BaseFormDialog>
 
+    <!-- Modal de Confirmação -->
     <BaseDeleteDialog v-model="deleteDialog" message="Tem certeza que deseja excluir esta matéria?" @cancel="deleteDialog = false" @confirm="deleteSubject" />
+
+    <!-- 🔹 Snackbar de Erro -->
+    <v-snackbar v-model="errorSnackbar" color="red" :timeout="4000">
+      {{ errorMessage }}
+      <template v-slot:actions>
+        <v-btn color="white" variant="text" @click="errorSnackbar = false">Fechar</v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
+import subjectsService from "@/services/subjectsService";
 import BaseTable from "@/components/BaseTable.vue";
 import BaseFormDialog from "@/components/BaseFormDialog.vue";
 import BaseDeleteDialog from "@/components/BaseDeleteDialog.vue";
@@ -39,12 +58,7 @@ export default defineComponent({
     BaseDeleteDialog,
   },
   setup() {
-    const subjects = ref<Subject[]>([
-      { id: 1, name: "Matemática" },
-      { id: 2, name: "Português" },
-      { id: 3, name: "História" },
-    ]);
-
+    const subjects = ref<Subject[]>([]);
     const headers = ref([
       { title: "ID", key: "id" },
       { title: "Nome", key: "name" },
@@ -57,6 +71,18 @@ export default defineComponent({
     const nameError = ref("");
     const subject = ref<Subject>({ id: 0, name: "" });
     const subjectToDelete = ref<number | null>(null);
+
+    const errorSnackbar = ref(false);
+    const errorMessage = ref("");
+
+    const fetchSubjects = async () => {
+      try {
+        subjects.value = await subjectsService.getAll();
+      } catch (error) {
+        console.error("Erro ao buscar matérias", error);
+        showError("Erro ao carregar matérias. Tente novamente.");
+      }
+    };
 
     const openDialog = () => {
       subject.value = { id: 0, name: "" };
@@ -76,17 +102,24 @@ export default defineComponent({
       return !nameError.value;
     };
 
-    const saveSubject = () => {
+    const saveSubject = async () => {
       if (!validateInput()) return;
 
-      if (editing.value) {
-        const index = subjects.value.findIndex((s) => s.id === subject.value.id);
-        if (index !== -1) subjects.value[index] = { ...subject.value };
-      } else {
-        subject.value.id = subjects.value.length + 1;
-        subjects.value.push({ ...subject.value });
+      const { name } = subject.value
+      const subjectData = { name }
+
+      try {
+        if (editing.value) {
+          await subjectsService.update(subject.value.id, subjectData);
+        } else {
+          await subjectsService.create(subjectData);
+        }
+        dialog.value = false;
+        await fetchSubjects();
+      } catch (error) {
+        console.error("Erro ao salvar matéria", error);
+        showError("Erro ao salvar matéria. Verifique os dados e tente novamente.");
       }
-      closeDialog();
     };
 
     const confirmDelete = (id: number) => {
@@ -94,15 +127,31 @@ export default defineComponent({
       deleteDialog.value = true;
     };
 
-    const deleteSubject = () => {
-      subjects.value = subjects.value.filter((s) => s.id !== subjectToDelete.value);
-      deleteDialog.value = false;
+    const deleteSubject = async () => {
+      if (subjectToDelete.value !== null) {
+        try {
+          await subjectsService.delete(subjectToDelete.value);
+          deleteDialog.value = false;
+          await fetchSubjects();
+        } catch (error) {
+          console.error("Erro ao excluir matéria", error);
+          showError("Erro ao excluir matéria. Tente novamente.");
+        }
+      }
     };
 
     const closeDialog = () => {
       dialog.value = false;
       nameError.value = "";
     };
+
+    // 🔹 Função para exibir erro no Snackbar
+    const showError = (message: string) => {
+      errorMessage.value = message;
+      errorSnackbar.value = true;
+    };
+
+    onMounted(fetchSubjects);
 
     return {
       subjects,
@@ -113,6 +162,8 @@ export default defineComponent({
       nameError,
       subject,
       subjectToDelete,
+      errorSnackbar,
+      errorMessage,
       openDialog,
       editSubject,
       validateInput,
