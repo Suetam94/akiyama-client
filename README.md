@@ -1,39 +1,71 @@
-# akiyama
+# 🎓 Gestão Acadêmica - Frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Este é o frontend da aplicação **Gestão Acadêmica**, desenvolvido com **Vue 3** e **Vuetify**.  
+A aplicação permite o gerenciamento de **matérias, alunos e provas**, oferecendo uma interface intuitiva e responsiva.
 
-## Recommended IDE Setup
+---
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 🚀 Tecnologias Utilizadas
 
-## Type Support for `.vue` Imports in TS
+- **Vue.js 3** - Framework progressivo para construção de interfaces
+- **Vuetify** - Biblioteca de componentes UI baseada no Material Design
+- **Vue Router** - Gerenciamento de rotas na aplicação
+- **Pinia** - Gerenciamento de estado leve e eficiente
+- **TypeScript** - Tipagem estática para maior segurança no código
+- **Axios** - Comunicação com a API backend (NestJS)
+- **Docker** - Configuração opcional para execução via container
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+---
 
-## Customize configuration
+## 🛠️ Configuração do Projeto
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+### 🔹 **Pré-requisitos**
+Certifique-se de ter instalado:
+- **Node.js** (versão 16 ou superior)
+- **npm** (gerenciador de pacotes do Node)
 
-## Project Setup
+### 🔹 **Passos para rodar o projeto**
 
+1️⃣ **Clone o repositório**
+```sh
+git clone https://github.com/seu-usuario/gestao-academica-frontend.git
+```
+2️⃣ **Acesse o diretório**
+```sh
+cd gestao-academica-frontend
+```
+3️⃣ **Instale as dependências**
 ```sh
 npm install
 ```
-
-### Compile and Hot-Reload for Development
-
+4️⃣ **Configure a URL do Backend**  
+Crie um arquivo **`.env`** na raiz do projeto e defina a variável:
+```sh
+VITE_API_BASE_URL=http://localhost:3000
+```
+5️⃣ **Inicie o servidor de desenvolvimento**
 ```sh
 npm run dev
 ```
+6️⃣ **Acesse a aplicação no navegador**  
+Abra [http://localhost:5173](http://localhost:5173) para visualizar a interface.
 
-### Type-Check, Compile and Minify for Production
+---
 
-```sh
-npm run build
-```
+## 📌 Funcionalidades
 
-### Lint with [ESLint](https://eslint.org/)
+✅ **CRUD de Matérias**  
+✅ **CRUD de Alunos**  
+✅ **CRUD de Provas**  
+✅ **Validações em formulários**  
+✅ **Feedback ao usuário (Snackbar para erros da API)**  
+✅ **Design responsivo com Vuetify**  
+✅ **Componentização para código limpo e reutilizável**
 
-```sh
-npm run lint
-```
+---
+
+## 📝 **Autor**
+Desenvolvido por **Mateus Vinícius da Silva**  
+📧 Entre em contato: **mateusviniciusdasilva@outlook.com**  
+🔗 [LinkedIn](https://www.linkedin.com/in/mateus-vin%C3%ADcius-da-silva-8156301a5/)
+

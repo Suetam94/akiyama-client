@@ -20,11 +20,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue'
 import type { PropType } from 'vue'
 
 export default defineComponent({
-  name: "BaseTable",
+  name: 'BaseTable',
   props: {
     headers: {
       type: Array as PropType<{ title: string; key: string }[]>,
@@ -35,8 +35,8 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["edit", "delete"],
-});
+  emits: ['edit', 'delete'],
+})
 </script>
 
 <style scoped>

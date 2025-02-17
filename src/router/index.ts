@@ -8,23 +8,23 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: "/",
-      name: "Home",
-      component: HomeView
+      path: '/',
+      name: 'Home',
+      component: HomeView,
     },
     {
-      path: "/materias",
-      name: "Materias",
+      path: '/materias',
+      name: 'Materias',
       component: SubjectsView,
     },
     {
-      path: "/alunos",
-      name: "Alunos",
+      path: '/alunos',
+      name: 'Alunos',
       component: StudentsView,
     },
     {
-      path: "/provas",
-      name: "Provas",
+      path: '/provas',
+      name: 'Provas',
       component: ExamsView,
     },
   ],

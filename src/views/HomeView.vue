@@ -1,10 +1,8 @@
 <template>
   <v-container fluid class="full-height d-flex flex-column align-center justify-center">
-    <!-- Título da Página -->
     <h1 class="mb-2">Gestão Acadêmica</h1>
     <p class="subtitle mb-6">Gerencie alunos, matérias e provas de forma simples e eficiente.</p>
 
-    <!-- Cards de Navegação -->
     <v-row justify="center" class="w-100">
       <v-col cols="12" md="4">
         <v-card class="hover-card text-center py-6" @click="goTo('/alunos')" elevation="5">
@@ -40,21 +38,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { useRouter } from "vue-router";
+import { defineComponent } from 'vue'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
-  name: "HomeView",
+  name: 'HomeView',
   setup() {
-    const router = useRouter();
+    const router = useRouter()
 
     const goTo = (path: string) => {
-      router.push(path);
-    };
+      router.push(path)
+    }
 
-    return { goTo };
+    return { goTo }
   },
-});
+})
 </script>
 
 <style scoped>
@@ -70,7 +68,9 @@ export default defineComponent({
 
 .hover-card {
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .hover-card:hover {

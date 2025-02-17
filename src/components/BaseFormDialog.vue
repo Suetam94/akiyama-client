@@ -6,7 +6,6 @@
       </v-card-title>
       <v-card-text>
         <slot></slot>
-        <!-- Formulário Dinâmico -->
       </v-card-text>
       <v-card-actions class="justify-end">
         <v-btn color="red" variant="text" @click="$emit('close')">Cancelar</v-btn>

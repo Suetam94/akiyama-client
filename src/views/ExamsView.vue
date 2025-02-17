@@ -10,10 +10,8 @@
       </v-btn>
     </div>
 
-    <!-- Tabela -->
     <BaseTable :headers="headers" :items="exams" @edit="editExam" @delete="confirmDelete" />
 
-    <!-- Modal de Formulário -->
     <BaseFormDialog
       v-model="dialog"
       :title="editing ? 'Editar Prova' : 'Nova Prova'"
@@ -53,7 +51,6 @@
       />
     </BaseFormDialog>
 
-    <!-- Modal de Confirmação -->
     <BaseDeleteDialog
       v-model="deleteDialog"
       message="Tem certeza que deseja excluir esta prova?"
@@ -61,7 +58,6 @@
       @confirm="deleteExam"
     />
 
-    <!-- 🔹 Snackbar de Erro -->
     <v-snackbar v-model="errorSnackbar" color="red" :timeout="4000">
       {{ errorMessage }}
       <template v-slot:actions>
@@ -72,69 +68,69 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
-import examsService from "@/services/examsService";
-import studentsService from "@/services/studentsService";
-import subjectsService from "@/services/subjectsService";
-import BaseTable from "@/components/BaseTable.vue";
-import BaseFormDialog from "@/components/BaseFormDialog.vue";
-import BaseDeleteDialog from "@/components/BaseDeleteDialog.vue";
+import { defineComponent, ref, onMounted } from 'vue'
+import examsService from '@/services/examsService'
+import studentsService from '@/services/studentsService'
+import subjectsService from '@/services/subjectsService'
+import BaseTable from '@/components/BaseTable.vue'
+import BaseFormDialog from '@/components/BaseFormDialog.vue'
+import BaseDeleteDialog from '@/components/BaseDeleteDialog.vue'
 
 interface Exam {
-  id: number;
-  score: number;
-  studentId: number;
-  subjectId: number;
-  student: { name: string };
-  subject: { name: string };
+  id: number
+  score: number
+  studentId: number
+  subjectId: number
+  student: { name: string }
+  subject: { name: string }
 }
 
 interface Student {
-  id: number;
-  name: string;
+  id: number
+  name: string
 }
 
 interface Subject {
-  id: number;
-  name: string;
+  id: number
+  name: string
 }
 
 export default defineComponent({
-  name: "ExamsView",
+  name: 'ExamsView',
   components: {
     BaseTable,
     BaseFormDialog,
     BaseDeleteDialog,
   },
   setup() {
-    const students = ref<Student[]>([]);
-    const subjects = ref<Subject[]>([]);
-    const exams = ref<Exam[]>([]);
+    const students = ref<Student[]>([])
+    const subjects = ref<Subject[]>([])
+    const exams = ref<Exam[]>([])
     const headers = ref([
-      { title: "ID", key: "id" },
-      { title: "Nota", key: "score" },
-      { title: "Aluno", key: "student.name" },
-      { title: "Matéria", key: "subject.name" },
-      { title: "Ações", key: "actions", sortable: false },
-    ]);
+      { title: 'ID', key: 'id' },
+      { title: 'Nota', key: 'score' },
+      { title: 'Aluno', key: 'student.name' },
+      { title: 'Matéria', key: 'subject.name' },
+      { title: 'Ações', key: 'actions', sortable: false },
+    ])
 
-    const dialog = ref(false);
-    const deleteDialog = ref(false);
-    const editing = ref(false);
-    const studentError = ref("");
-    const subjectError = ref("");
-    const scoreError = ref("");
+    const dialog = ref(false)
+    const deleteDialog = ref(false)
+    const editing = ref(false)
+    const studentError = ref('')
+    const subjectError = ref('')
+    const scoreError = ref('')
     const exam = ref<Exam>({
       id: 0,
       score: 0,
       studentId: 0,
       subjectId: 0,
-      student: { name: "" },
-      subject: { name: "" },
-    });
-    const examToDelete = ref<number | null>(null);
-    const errorSnackbar = ref(false);
-    const errorMessage = ref("");
+      student: { name: '' },
+      subject: { name: '' },
+    })
+    const examToDelete = ref<number | null>(null)
+    const errorSnackbar = ref(false)
+    const errorMessage = ref('')
 
     const fetchData = async () => {
       try {
@@ -142,10 +138,10 @@ export default defineComponent({
           studentsService.getAll(),
           subjectsService.getAll(),
           examsService.getAll(),
-        ]);
+        ])
 
-        students.value = studentsData;
-        subjects.value = subjectsData;
+        students.value = studentsData
+        subjects.value = subjectsData
 
         exams.value = examsData.map((exam) => ({
           id: exam.id,
@@ -154,13 +150,12 @@ export default defineComponent({
           subjectId: exam.subjectId,
           student: { name: exam.student.name },
           subject: { name: exam.subject.name },
-        })) as Exam[];
+        })) as Exam[]
       } catch (error) {
-        console.error("Erro ao carregar provas", error);
-        showError("Erro ao carregar provas. Tente novamente.");
+        console.error('Erro ao carregar provas', error)
+        showError('Erro ao carregar provas. Tente novamente.')
       }
-    };
-
+    }
 
     const openDialog = () => {
       exam.value = {
@@ -168,83 +163,83 @@ export default defineComponent({
         score: 0,
         studentId: 0,
         subjectId: 0,
-        student: { name: "" },
-        subject: { name: "" },
-      };
-      editing.value = false;
-      clearErrors();
-      dialog.value = true;
-    };
+        student: { name: '' },
+        subject: { name: '' },
+      }
+      editing.value = false
+      clearErrors()
+      dialog.value = true
+    }
 
     const editExam = (item: Exam) => {
-      exam.value = { ...item };
-      editing.value = true;
-      clearErrors();
-      dialog.value = true;
-    };
+      exam.value = { ...item }
+      editing.value = true
+      clearErrors()
+      dialog.value = true
+    }
 
     const validateInput = () => {
-      studentError.value = exam.value.studentId ? "" : "Selecione um aluno.";
-      subjectError.value = exam.value.subjectId ? "" : "Selecione uma matéria.";
-      scoreError.value = exam.value.score >= 0 ? "" : "A nota deve ser maior ou igual a 0.";
+      studentError.value = exam.value.studentId ? '' : 'Selecione um aluno.'
+      subjectError.value = exam.value.subjectId ? '' : 'Selecione uma matéria.'
+      scoreError.value = exam.value.score >= 0 ? '' : 'A nota deve ser maior ou igual a 0.'
 
-      return !studentError.value && !subjectError.value && !scoreError.value;
-    };
+      return !studentError.value && !subjectError.value && !scoreError.value
+    }
 
     const saveExam = async () => {
-      if (!validateInput()) return;
-      const { score, studentId, subjectId } = exam.value;
-      const examData = { score, studentId, subjectId };
+      if (!validateInput()) return
+      const { score, studentId, subjectId } = exam.value
+      const examData = { score, studentId, subjectId }
 
       try {
         if (editing.value) {
-          await examsService.update(exam.value.id, examData);
+          await examsService.update(exam.value.id, examData)
         } else {
-          await examsService.create(examData);
+          await examsService.create(examData)
         }
-        dialog.value = false;
-        await fetchData();
+        dialog.value = false
+        await fetchData()
       } catch (error) {
-        console.error("Erro ao salvar prova", error);
-        showError("Erro ao salvar prova. Verifique os dados e tente novamente.");
+        console.error('Erro ao salvar prova', error)
+        showError('Erro ao salvar prova. Verifique os dados e tente novamente.')
       }
-    };
+    }
 
     const confirmDelete = (id: number) => {
-      examToDelete.value = id;
-      deleteDialog.value = true;
-    };
+      examToDelete.value = id
+      deleteDialog.value = true
+    }
 
     const deleteExam = async () => {
       if (examToDelete.value !== null) {
         try {
-          await examsService.delete(examToDelete.value);
-          deleteDialog.value = false;
-          await fetchData();
+          await examsService.delete(examToDelete.value)
+          deleteDialog.value = false
+          await fetchData()
         } catch (error) {
-          console.error("Erro ao excluir prova", error);
-          showError("Erro ao excluir prova. Tente novamente.");
+          console.error('Erro ao excluir prova', error)
+          showError('Erro ao excluir prova. Tente novamente.')
         }
       }
-    };
+    }
 
     const closeDialog = () => {
-      dialog.value = false;
-      clearErrors();
-    };
+      dialog.value = false
+      clearErrors()
+    }
 
     const clearErrors = () => {
-      studentError.value = "";
-      subjectError.value = "";
-      scoreError.value = "";
-    };
+      studentError.value = ''
+      subjectError.value = ''
+      scoreError.value = ''
+    }
 
     const showError = (message: string) => {
-      errorMessage.value = message;
-      errorSnackbar.value = true;
-    };
+      errorMessage.value = message
+      errorSnackbar.value = true
+    }
 
-    onMounted(fetchData);
+    onMounted(fetchData)
 
     return {
       students,
@@ -268,7 +263,7 @@ export default defineComponent({
       confirmDelete,
       deleteExam,
       closeDialog,
-    };
+    }
   },
-});
+})
 </script>
