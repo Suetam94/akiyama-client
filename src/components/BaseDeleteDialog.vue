@@ -12,10 +12,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: "BaseDeleteDialog",
+  name: 'BaseDeleteDialog',
   props: {
     modelValue: Boolean,
     message: String,
@@ -23,13 +23,13 @@ export default defineComponent({
   computed: {
     dialog: {
       get() {
-        return this.modelValue;
+        return this.modelValue
       },
       set(value: boolean) {
-        this.$emit("update:modelValue", value);
+        this.$emit('update:modelValue', value)
       },
     },
   },
-  emits: ["update:modelValue", "cancel", "confirm"],
-});
+  emits: ['update:modelValue', 'cancel', 'confirm'],
+})
 </script>
