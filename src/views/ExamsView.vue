@@ -145,7 +145,7 @@ export default defineComponent({
 
         exams.value = examsData.map((exam) => ({
           id: exam.id,
-          score: exam.score,
+          score: Number(exam.score.toFixed(2)),
           studentId: exam.studentId,
           subjectId: exam.subjectId,
           student: { name: exam.student.name },
