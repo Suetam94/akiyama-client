@@ -10,10 +10,8 @@ A aplicação permite o gerenciamento de **matérias, alunos e provas**, oferece
 - **Vue.js 3** - Framework progressivo para construção de interfaces
 - **Vuetify** - Biblioteca de componentes UI baseada no Material Design
 - **Vue Router** - Gerenciamento de rotas na aplicação
-- **Pinia** - Gerenciamento de estado leve e eficiente
 - **TypeScript** - Tipagem estática para maior segurança no código
 - **Axios** - Comunicação com a API backend (NestJS)
-- **Docker** - Configuração opcional para execução via container
 
 ---
 
@@ -28,11 +26,11 @@ Certifique-se de ter instalado:
 
 1️⃣ **Clone o repositório**
 ```sh
-git clone https://github.com/seu-usuario/gestao-academica-frontend.git
+git clone https://github.com/Suetam94/
 ```
 2️⃣ **Acesse o diretório**
 ```sh
-cd gestao-academica-frontend
+cd akiyama-client
 ```
 3️⃣ **Instale as dependências**
 ```sh
